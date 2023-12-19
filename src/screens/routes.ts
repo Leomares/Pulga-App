@@ -1,9 +1,9 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 export type RootStackParamList = {
-    BLE_device: undefined;
-    Status: undefined;
-    History: undefined;
-  };
-  
+	Devices: undefined;
+	Status: undefined;
+	History: undefined;
+};
+
 export const Stack = createNativeStackNavigator<RootStackParamList>();

@@ -26,7 +26,7 @@ export function screenBLE({
 		navigation.setOptions({
 			headerLeft: () => (
 				<Button
-					onPress={() => navigation.navigate('BLE_device')}
+					onPress={() => navigation.navigate('Devices')}
 					title="Device"
 					color="#2196F3"
 				/>
