@@ -72,8 +72,8 @@ const Modal = ({show, close}) => {
 				<Text style={styles.text}>
 					Fault detected. Please, contact us for further instructions:
 				</Text>
-				<Text style={styles.text}>(11) 9XXXX-XXXX</Text>
-				<Text style={styles.text}>email@mail.com</Text>
+				<Text style={styles.text}>(11) 91234-5678</Text>
+				<Text style={styles.text}>joaomaria@email.com</Text>
 
 				<TouchableOpacity style={styles.btn} onPress={close}>
 					<Text style={{color: '#fff'}}>Close</Text>

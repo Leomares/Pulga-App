@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
 	Button,
 	View,
@@ -10,9 +10,20 @@ import {
 
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 
-import {RootStackParamList} from './routes';
+import {
+	RootStackParamList,
+	DeviceContext,
+	DeviceContextType,
+} from './screenNavigator';
+
 import {TableFreqs} from '../utils/tableFreqs';
 import Modal from '../utils/Modal.jsx';
+import {
+	defaultData,
+	dataCollected,
+	getRandomData,
+	setNewData,
+} from '../utils/DataCollected.ts';
 
 import {BLEService} from '../BLEService';
 
@@ -42,7 +53,7 @@ const S_BIN_UUID = fullUUID('2a387bdc-8a3e-11ee-b9d1-0242ac120002');
 const C_BIN_FREQ_UUID = fullUUID('8f904730-8a3e-11ee-b9d1-0242ac120002');
 const C_BIN_AMP_UUID = fullUUID('817bf5ba-8eec-11ee-b9d1-0242ac120002');
 
-export function screenStatus({
+export function ScreenStatus({
 	navigation,
 }: NativeStackScreenProps<RootStackParamList>) {
 	useEffect(() => {
@@ -84,31 +95,17 @@ export function screenStatus({
 		}
 	}, [navigation]);
 
-	interface dataCollected {
-		date: number;
-		freq: number[] | undefined;
-		amplitude: number[] | undefined;
-		eval: number;
-		SNR: number;
-	}
-
-	const defaultData: dataCollected = {
-		date: Date.now(),
-		freq: [0, 0, 0, 0, 0],
-		amplitude: [0, 0, 0, 0, 0],
-		eval: 0,
-		SNR: Number(Infinity),
-	};
-
 	const [currentData, setCurrentData] = useState(defaultData);
 
 	const [enableUpdate, setEnableUpdate] = useState(false);
+
+	const {deviceName, setDeviceName} = useContext(DeviceContext);
 
 	useEffect(() => {
 		if (enableUpdate) {
 			let timer = setTimeout(() => {
 				screenStatusReadData();
-			}, 5000);
+			}, 10000);
 			return () => clearTimeout(timer);
 		}
 	}, [currentData, enableUpdate]);
@@ -185,32 +182,16 @@ export function screenStatus({
 					setEnablePopUp(true);
 				}
 				setCurrentData(newDataBLE);
+				setNewData(deviceName, newDataBLE);
 			})
 			.catch(function (err) {
 				console.log(err);
-				const errorCurrentData: dataCollected = {
-					date: Date.now(),
-					freq: [
-						Math.random() * 800,
-						Math.random() * 800,
-						Math.random() * 800,
-						Math.random() * 800,
-						Math.random() * 800,
-					],
-					amplitude: [
-						Math.random() * 0.2 + 0.8,
-						Math.random() * 0.2 + 0.6,
-						Math.random() * 0.2 + 0.4,
-						Math.random() * 0.2 + 0.2,
-						Math.random() * 0.2 + 0.0,
-					],
-					eval: (Math.random() - 0.5) / 2 + 0.4,
-					SNR: Math.random(),
-				};
+				const errorCurrentData: dataCollected = getRandomData();
 				if (errorCurrentData.eval > 0.5) {
 					setEnablePopUp(true);
 				}
 				setCurrentData(errorCurrentData);
+				setNewData(deviceName, errorCurrentData);
 			});
 	}
 
@@ -248,7 +229,7 @@ export function screenStatus({
 				<View style={styles.block}>
 					<View style={styles.item}>
 						<Text style={styles.label}>Device name</Text>
-						<Text style={styles.data}>pegar ainda</Text>
+						<Text style={styles.data}>{deviceName}</Text>
 					</View>
 					<View style={styles.item}>
 						<Text style={styles.label}>Last updated</Text>

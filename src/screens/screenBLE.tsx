@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 
 import {
 	Button,
@@ -15,11 +15,15 @@ import {Device} from 'react-native-ble-plx';
 
 import {BLEService} from '../BLEService';
 
-import {RootStackParamList} from './routes';
+import {
+	RootStackParamList,
+	DeviceContext,
+	DeviceContextType,
+} from './screenNavigator';
 
 import {cloneDeep} from '../utils/deepCopy';
 
-export function screenBLE({
+export function ScreenBLE({
 	navigation,
 }: NativeStackScreenProps<RootStackParamList>) {
 	React.useEffect(() => {
@@ -53,6 +57,8 @@ export function screenBLE({
 
 	const [isIdle, setIsIdle] = useState(true);
 	const [foundDevices, setFoundDevices] = useState<Device[]>([]);
+	const {deviceName, setDeviceName} =
+		useContext<DeviceContextType>(DeviceContext);
 
 	const addFoundDevice = (device: Device) =>
 		setFoundDevices(prevState => {
@@ -97,7 +103,10 @@ export function screenBLE({
 				<TouchableOpacity
 					onPress={() => {
 						BLEService.connectToDevice(item.id)
-							.then(onConnectSuccess)
+							.then(() => {
+								onConnectSuccess;
+								setDeviceName(item.name ? item.name : '');
+							})
 							.catch(onConnectFail);
 					}}
 					style={[styles.item, {backgroundColor}]}>
